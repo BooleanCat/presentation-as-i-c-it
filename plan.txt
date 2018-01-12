@@ -1,0 +1,22 @@
+Result
+  Show existing ways to check failure:
+  - return NULL instead of a pointer to a thing
+  - return a less appropriate type to accomodate failure
+  - return something like int to indicate failure
+  - restrict your function to assumptions of success (e.g. strlen) or as I call it "make it someone else's problem"
+  Show implementations using Result
+  Show how Python represents errors
+  - Any of the above +
+  - Setting a global exception variable
+  Show diagram of Python/quicktable border and explain how a Python exception would propagate through
+  Show implementation of function that returns a Result{Type}, explain args to macros
+  Show boilerplate required to register a Result{Type}
+
+Stubbing (consider a function narrative)
+  Show example function using malloc that returns an error, explain how it's difficult to force it to fail
+  Explain that Linux could use __wrap to switch out the malloc at link time, but I need to support Windows, Linux, OSX
+  Show macro solution that throws in the real malloc by default, show examples in tests
+  Show how structs can contain function pointers to these stubbables, and the struct's "new" method will setup defaults
+  Show tests that override these functions
+
+Poor Man's OOP

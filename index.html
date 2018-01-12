@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h1>As I C it</h1>
+					<p>Three "C gems" that I probably didn't invent but have been useful.</p>
+				</section>
+
+				<section>
+					<h2>The `Result` wrapper</h2>
+
+					<section>
+						<p>C uses "special values" of variables to indicate that a function failed, here's a few examples:</p>
+					</section>
+
+					<section>
+						<p>NULL as a failure when a function returns a pointer</p>
+
+						<pre><code>
+char *word;
+
+word = (char *)malloc(sizeof(char) * 10);
+if (word == NULL) explode();
+
+doSomething(word);
+						</code></pre>
+					</section>
+
+					<section>
+						<p>Changing the type to something less appropriate to accomodate failures</p>
+
+						<pre><code>
+int bytes_written;
+
+bytes_written = sprintf(greeting, "Hi! %s\n", name);
+if (bytes_written < 0) explode();
+
+doSomething(greeting);
+						</code></pre>
+					</section>
+
+					<section>
+						<p>Some particular value indicating a failure</p>
+
+						<pre><code>
+if (PySequence_Check(list) == -1) explode();
+
+doSomething(list);
+						</code></pre>
+					</section>
+
+					<section>
+						<p>The alternative, wrap results in a struct that could contain either the result or a failure</p>
+
+						<pre><code>
+	ResultCharPtr word;
+
+	word = make_word(sizeof(char) * 10);
+	if (ResultFailed(word)) explode();
+
+	doSomething(ResultValue(word));
+						</code></pre>
+					</section>
+
+					<section>
+						<pre><code>
+ResultSize_t bytes_written;
+
+bytes_written = format_greeting(greeting, "Hi %s!\n", name);
+if (ResultFailed(bytes_written)) explode();
+
+doSomething(ResultValue(bytes_written));
+						</code></pre>
+					</section>
+
+					<section>
+						<pre><code>
+if (ResultFailed(is_list(list)) explode();
+
+doSomething(list);
+						</code></pre>
+					</section>
+
+					<section>
+						<p>Implementing a function that returns a Result{Type}:</p>
+
+						<pre><code>
+ResultCharPtr qtb_column_str_cell_as_string(QtbColumn *column, size_t i) {
+  char *copy;
+
+  copy = column->strdup(column->data[i].s);
+  if (copy == NULL)
+    return ResultCharPtrFailure(PyExc_MemoryError, "memory error");
+
+  return ResultCharPtrSuccess(copy);
+}
+						</code></pre>
+					</section>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
